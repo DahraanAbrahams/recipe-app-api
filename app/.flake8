@@ -1,0 +1,7 @@
+#We're configuring flake8 to exclude linting from the following files
+[flake8]
+exclude = 
+    migrations,
+    __pycache__,
+    manage.py,
+    settings.py

@@ -1,0 +1,19 @@
+#Allows us to specify a list of files that are going to be excluded from the docker context. 
+#When you run a docker image, it uses something called the Docker Context which is the directory that you're running from.
+#All files are passed into the context except for files listed here - in docker ignore.
+
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+
+# Python
+app/__pycache__/
+app/*/__pycache__/
+app/*/*/__pycache__/
+app/*/*/*/__pycache__/
+.env/
+.venv/
+venv/

@@ -1,0 +1,3 @@
+#The reason for this seperate req files is because we're going to add a custom step to our build so that we only
+#install the dev requirements when building an image for our local dev server
+flake8>=3.9.2,<3.10

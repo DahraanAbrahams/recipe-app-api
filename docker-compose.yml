@@ -1,0 +1,24 @@
+#Below, version of docker compose that we're going to be using
+version: "3.9"
+
+#Docker compose file typically comprises of one or more services that's needed for your application
+services: 
+  #app is the service that's going to run our docker file
+  app:
+    #build: context: . build the docker file inside of our current directory
+   build:
+     context: .
+     args:
+       - DEV=true
+    #maps port 8000 on local machine to 8000 on the container - this is how we can access the network when connecting to server
+   ports:
+     - "8000:8000"
+    #how we map directories from our system into container. Here we're mapping app dir we created in project to /app in container 
+    #Changes/updates made in local project reflected in running container in realtime. We don't want to rebuild image just for this
+   volumes:
+     - ./app:/app
+    #Command used to run the service. We can override this command we we run docker-compose run. This command here will be default
+    #if no command is specified with docker-compose run 
+   command: >
+    sh -c "python manage.py runserver 0.0.0.0:8000"
+     
