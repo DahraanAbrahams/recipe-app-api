@@ -10,4 +10,5 @@ app_name = 'user' #We define app_name to equal 'user'. CREATE_USER_URL = reverse
 
 urlpatterns = [
     path('create/', views.CreateUserView.as_view(), name='create'), #Any req to 'create/' will be handled by the CreateUserView view that we created in view
+    path('token/', views.CreateTokenView.as_view(), name='token'), #Any req to 'create/' will be handled by the CreateUserView view that we created in view
 ]
