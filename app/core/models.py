@@ -49,6 +49,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email' #Defines field that we want to use for authentication. This is how we replace the username
                              #default field that comes with the default user model to our custom email field
     
+
+
 class Recipe(models.Model):
     """Recipe Object"""
     user = models.ForeignKey(   #Used to store the user that the recipe belongs to. The ForeignKey allows us to setup a relationship between the recipe model and another model
@@ -61,6 +63,20 @@ class Recipe(models.Model):
     time_minutes = models.IntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     link = models.CharField(max_length=255, blank = True)
+    tags = models.ManyToManyField('Tag') # We could have many different recipes that have many tags
 
     def __str__(self):
         return self.title
+    
+
+
+class Tag(models.Model):
+    """Tag for filtering recipes"""
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(   #Used to store the user that the recipe belongs to. The ForeignKey allows us to setup a relationship between the recipe model and another model
+        settings.AUTH_USER_MODEL, #That relationship TO is the AUTH_USER_MODEL which we defined in our settings.py file (User Model)
+        on_delete = models.CASCADE, #If the related object gets deleted, we cascade that i.e. if the user is deleted, we also delete all recipes associated with that user
+    )
+
+    def __str__(self):
+        return self.name
