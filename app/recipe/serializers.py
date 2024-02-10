@@ -3,8 +3,17 @@
 from rest_framework import serializers
 from core.models import (
    Recipe,
-   Tag
+   Tag,
+   Ingredient
 )
+
+class IngredientSerializer(serializers.ModelSerializer):
+   """Serializer for ingredients"""
+
+   class Meta:
+      model = Ingredient
+      fields = ['id', 'name']
+      read_only_fields = ['id']
 
 class TagSerializer(serializers.ModelSerializer):
    """Serializer for tags"""
@@ -19,10 +28,12 @@ class RecipeSerializer(serializers.ModelSerializer): #We're using the ModelSeria
    """Serializer for recipes"""
 
    tags = TagSerializer(many=True, required=False)
+   ingredients = IngredientSerializer(many=True, required=False)
 
    class Meta:
       model = Recipe
-      fields = ['id', 'title', 'time_minutes', 'price', 'link', 'tags']
+      fields = ['id', 'title', 'time_minutes', 'price', 'link', 'tags', 
+                'ingredient']
       read_only_fields = ['id']
 
    def _get_or_create_tags(self, tags, recipe):
@@ -33,17 +44,33 @@ class RecipeSerializer(serializers.ModelSerializer): #We're using the ModelSeria
          tag_obj, created = Tag.objects.get_or_create(#get_or_create is a helper method available for your model manager
             #It gets the value if it already exists or it creates the value with the passed in values if it doesn't exist
             user = auth_user,
-            **tag
+            **tag,
          )
          recipe.tags.add(tag_obj)
+
+   def _get_or_create_ingredients(self, ingredients, recipe): #_method is used internally only "private", i.e. we don't expect
+      #anyone using this serializer to be calling _get_or_create_ingredients directly. It should only be used by other 
+      #methods inside the RecipeSerializer. There's no technical restriction on it however it's best practice not too
+      """Handle getting or creating ingredients as needed"""
+
+      auth_user = self.context['request'].user
+      for ingredient in ingredients:
+         ingredient_obj, create = Ingredient.objects.get_or_create( #gets obj if exists or create new
+            #gives a 'create' attr - boolean to know whether the ingredient_obj was created or not. We don't need to us it  
+            user = auth_user,
+            **ingredient
+         )
+         recipe.ingredients.add(ingredient_obj)
 
    def create(self, validated_data):
       """Create a recipe"""
       tags = validated_data.pop('tags', []) #removing tags
+      ingredients = validated_data.pop('ingredients', []) #removing ingredients
       recipe = Recipe.objects.create(**validated_data) #creating a recipe with excluded tags
       
       self._get_or_create_tags(tags, recipe)
-      
+      self._get_or_create_tags(ingredients, recipe)
+
       return recipe
    
    def update(self, instance, validated_data):
@@ -54,7 +81,7 @@ class RecipeSerializer(serializers.ModelSerializer): #We're using the ModelSeria
          instance.tags.clear()
          self._get_or_create_tags(tags, instance)
 
-      for attr, value in validated_data.items:
+      for attr, value in validated_data.items():
          setattr(instance, attr, value)
 
       instance.save()

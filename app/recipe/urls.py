@@ -14,6 +14,7 @@ router.register('recipes', views.RecipeViewSet)# This will create a new endpoint
 #Because we are using the ModelViewSet, it's going to support all the available methods to create, read, update and delete
 #IT will create a register endpoints for eahc of those options
 router.register('tags', views.TagViewSet)
+router.register('ingredients', views.IngredientViewSet)
 
 app_name = 'recipe' #We define the name that is used to identify the name when we do the reverse lookup of URLs
 
